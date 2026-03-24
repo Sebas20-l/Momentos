@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity() {
             Mobile1ProjectTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Greeting(
-                        name = "Sebastian 14970 y Cristhian 15186 HHHHHHHHHHHHHHHHHHHHHHHH",
+                        name = "Sebastian 14970 y Cristhian 15186 HHhhhhhhHHHHHHHHHHHHHHHHHHHHHH",
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
