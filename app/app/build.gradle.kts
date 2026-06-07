@@ -34,7 +34,7 @@ android {
         compose = true
     }
     kotlinOptions {
-        jvmTarget = "21"
+        jvmTarget = "11"
     }
 }
 
@@ -50,7 +50,6 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.core.ktx)
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
     implementation(libs.coil.compose)
