@@ -1,7 +1,12 @@
 package com.example.mobilproject1.ui.home.model
 
-data class HomeModel(
-    val title: String = "Momentos",
-    val description: String = "Tu álbum familiar privado",
-    val gistContent: String = "Cargando..."
+data class Memory(
+    val title: String,
+    val date: String,
+    val description: String,
+    val photoUrl: String
+)
+
+data class MemoriesResponse(
+    val memories: List<Memory>
 )
