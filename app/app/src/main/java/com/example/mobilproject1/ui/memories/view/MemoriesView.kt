@@ -1,46 +1,90 @@
 package com.example.mobilproject1.ui.memories.view
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AutoAwesome
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.mobilproject1.ui.memories.viewmodel.MemoriesViewModel
+import coil.compose.AsyncImage
+import com.example.mobilproject1.ui.home.model.Memory
+import com.example.mobilproject1.ui.home.viewmodel.HomeViewModel
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MemoriesView(
+    onBack: () -> Unit = {},
+    viewModel: HomeViewModel = viewModel()
+) {
+    val memories by viewModel.memories.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val error by viewModel.error.collectAsState()
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Memorias") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                }
+            )
+        }
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            when {
+                isLoading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                error != null -> Text(
+                    text = "Error: $error",
+                    modifier = Modifier.align(Alignment.Center),
+                    color = MaterialTheme.colorScheme.error
+                )
+                else -> LazyColumn(
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(memories) { memory -> MemoryCard(memory) }
+                }
+            }
+        }
+    }
+}
 
 @Composable
-fun MemoriesView(memoriesViewModel: MemoriesViewModel = viewModel()) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+private fun MemoryCard(memory: Memory) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp)
     ) {
-        Icon(
-            imageVector = Icons.Filled.AutoAwesome,
-            contentDescription = "Recuerdos",
-            modifier = Modifier.height(80.dp)
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = memoriesViewModel.state.title,
-            style = MaterialTheme.typography.headlineMedium
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = memoriesViewModel.state.description,
-            style = MaterialTheme.typography.bodyMedium
-        )
+        Column {
+            AsyncImage(
+                model = memory.photoUrl,
+                contentDescription = memory.title,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(180.dp)
+                    .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)),
+                contentScale = ContentScale.Crop
+            )
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(memory.title, style = MaterialTheme.typography.titleMedium)
+                Text(memory.date, style = MaterialTheme.typography.bodySmall)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(memory.description, style = MaterialTheme.typography.bodyMedium)
+            }
+        }
     }
 }
