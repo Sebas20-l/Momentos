@@ -2,29 +2,38 @@ package com.example.mobilproject1.ui.home.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mobilproject1.ui.home.model.HomeModel
+import com.example.mobilproject1.ui.home.model.Memory
 import com.example.mobilproject1.ui.home.network.GistClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class HomeViewModel : ViewModel() {
 
-    private val _state = MutableStateFlow(HomeModel())
-    val state: StateFlow<HomeModel> = _state
+    private val _memories = MutableStateFlow<List<Memory>>(emptyList())
+    val memories: StateFlow<List<Memory>> = _memories.asStateFlow()
+
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error.asStateFlow()
 
     init {
-        loadGist()
+        fetchMemories()
     }
 
-    private fun loadGist() {
+    private fun fetchMemories() {
         viewModelScope.launch {
+            _isLoading.value = true
+            _error.value = null
             try {
-                val response = GistClient.service.getGist()
-                val content = response.files["EmojiReactionCounter.kt"]?.content ?: ""
-                _state.value = _state.value.copy(gistContent = content)
+                _memories.value = GistClient.service.getMemories().memories
             } catch (e: Exception) {
-                _state.value = _state.value.copy(gistContent = "Error cargando Gist")
+                _error.value = e.message
+            } finally {
+                _isLoading.value = false
             }
         }
     }
