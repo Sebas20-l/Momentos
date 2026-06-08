@@ -50,13 +50,18 @@ fun AppNavigation() {
             )
         }
         composable("tabs") {
-            TabsScaffold()
+            TabsScaffold(
+                onNavigateToMemoriesList = { rootNavController.navigate("memories_list") }
+            )
+        }
+        composable("memories_list") {
+            MemoriesView(onBack = { rootNavController.popBackStack() })
         }
     }
 }
 
 @Composable
-private fun TabsScaffold() {
+private fun TabsScaffold(onNavigateToMemoriesList: () -> Unit) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -88,7 +93,9 @@ private fun TabsScaffold() {
             startDestination = AppRoute.Home.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(AppRoute.Home.route) { HomeView() }
+            composable(AppRoute.Home.route) {
+                HomeView(onNavigateToMemoriesList = onNavigateToMemoriesList)
+            }
             composable(AppRoute.Album.route) { AlbumView() }
             composable(AppRoute.Memories.route) { MemoriesView() }
         }
